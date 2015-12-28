@@ -26,12 +26,10 @@
 set -e
 
 # Snappy 1.1.2
-#SNAPPY_VSN=1ff9be9b8fafc8528ca9e055646f5932aa5db9c4
-SNAPPY_VSN=HEAD
+SNAPPY_VSN=1ff9be9b8fafc8528ca9e055646f5932aa5db9c4
 
 # HyperLevelDB Apr 23, 2014
-#LEVELDB_VSN=4b9bac17ab11527ea15af0ea3c8f1b825a9de18a
-LEVELDB_VSN=HEAD
+LEVELDB_VSN=02ad33ccecc762fc611cc47b26a51bf8e023b92e
 
 PLATFORM='unknown'
 unamestr=`uname`
@@ -86,13 +84,13 @@ BASEDIR="$PWD"
 
 case "$1" in
     clean)
-        rm -rf snappy snappy-$SNAPPY_VSN
-        rm -rf HyperLevelDB HyperLevelDB-$LEVELDB_VSN
+        rm -rf snappy
+        rm -rf HyperLevelDB
         ;;
 
     get_deps)
-	git clone git://github.com/leveldb-erlang/snappy.git $BASEDIR/snappy-src
-        git clone git://github.com/leveldb-erlang/HyperLevelDB.git $BASEDIR/HyperLevelDB-src
+	#git clone git://github.com/leveldb-erlang/snappy.git $BASEDIR/snappy-src
+        #git clone git://github.com/leveldb-erlang/HyperLevelDB.git $BASEDIR/HyperLevelDB-src
         ;;
 
     *)
@@ -109,18 +107,18 @@ case "$1" in
                     exit -1
                 }
             }
-            (cd snappy-src && \
+            (cd snappy-$SNAPPY_VSN && \
                 sed -ibak1 '/^AC_ARG_WITH.*$/, /^fi$/d' configure.ac && \
                 perl -ibak2 -pe 's/LT_INIT/AM_PROG_AR\nLT_INIT/' configure.ac
             )
-            (cd snappy-src && \
+            (cd snappy-$SNAPPY_VSN && \
                 rm -rf autom4te.cache && \
                 aclocal -I m4 && \
                 autoheader && \
                 $LIBTOOLIZE --copy && \
                 automake --add-missing --copy && \
                 autoconf)
-            (cd snappy-src && \
+            (cd snappy-$SNAPPY_VSN && \
                 env $CONFENV ./configure $CONFFLAGS \
                 --enable-static \
                 --disable-shared \
@@ -131,7 +129,7 @@ case "$1" in
 
         # HyperLevelDB
         if [ ! -f $BASEDIR/HyperLevelDB/lib/libhyperleveldb.a ]; then
-            (cd HyperLevelDB-src && \
+            (cd HyperLevelDB-$LEVELDB_VSN && \
                 autoreconf -i && \
                 env $CONFENV \
                     CXXFLAGS="$CXXFLAGS -fPIC -O2 -DNDEBUG -DSNAPPY -I$BASEDIR/snappy/include" \
