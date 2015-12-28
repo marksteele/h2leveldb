@@ -91,11 +91,13 @@ case "$1" in
         ;;
 
     get_deps)
+	echo "Retrieving snappy"
         # snappy
         if [ ! -d $REBAR_DEPS_DIR/snappy ]; then
             git clone git://github.com/leveldb-erlang/snappy.git $REBAR_DEPS_DIR/snappy
         fi
         # HyperLevelDB
+	echo "Retrieving HyperLevelDB"
         if [ ! -d $REBAR_DEPS_DIR/HyperLevelDB ]; then
              git clone git://github.com/leveldb-erlang/HyperLevelDB.git $REBAR_DEPS_DIR/HyperLevelDB
         fi
@@ -115,7 +117,7 @@ case "$1" in
                     exit -1
                 }
             }
-
+	echo "Creating a tar archive from the snappy git checkout and piping it to untar"
             (cd $REBAR_DEPS_DIR/snappy && git archive --format=tar \
                 --prefix=snappy-$SNAPPY_VSN/ $SNAPPY_VSN) \
                 | $TAR xf -
@@ -123,6 +125,7 @@ case "$1" in
                 sed -ibak1 '/^AC_ARG_WITH.*$/, /^fi$/d' configure.ac && \
                 perl -ibak2 -pe 's/LT_INIT/AM_PROG_AR\nLT_INIT/' configure.ac
             )
+	echo "Building snappy"
             (cd snappy-$SNAPPY_VSN && \
                 rm -rf autom4te.cache && \
                 aclocal -I m4 && \
@@ -141,9 +144,11 @@ case "$1" in
 
         # HyperLevelDB
         if [ ! -f $BASEDIR/HyperLevelDB/lib/libhyperleveldb.a ]; then
+	echo "Archive/tar of hyperleveldb"
             (cd $REBAR_DEPS_DIR/HyperLevelDB && git archive --format=tar \
                 --prefix=HyperLevelDB-$LEVELDB_VSN/ $LEVELDB_VSN) \
                 | $TAR xf -
+	echo "Building hyperleveldb"
             (cd HyperLevelDB-$LEVELDB_VSN && \
                 autoreconf -i && \
                 env $CONFENV \
