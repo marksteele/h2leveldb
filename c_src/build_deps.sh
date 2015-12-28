@@ -94,6 +94,12 @@ case "$1" in
         ;;
 
     *)
+	if [ ! -d snappy-$SNAPPY_VSN ]; then
+		tar xfz snappy-$SNAPPY_VSN.tar.gz
+	fi
+	if [ ! -d HyperLevelDB-$LEVELDB_VSN ]; then
+		tar xfz HyperLevelDB-$LEVELDB_VSN.tar.gz
+	fi
         # snappy
         if [ ! -f $BASEDIR/snappy/lib/libsnappy.a ]; then
             LIBTOOLIZE=libtoolize
