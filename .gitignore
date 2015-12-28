@@ -4,10 +4,10 @@
 .rebar/
 c_src/*.d
 c_src/*.o
-c_src/HyperLevelDB-*/
 c_src/HyperLevelDB/
-c_src/snappy-*/
 c_src/snappy/
+c_src/HyperLevelDB-src/
+c_src/snappy-src/
 deps/
 ebin/
 erl_crash.dump

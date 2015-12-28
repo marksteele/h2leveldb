@@ -26,12 +26,12 @@
 set -e
 
 # Snappy 1.1.2
-SNAPPY_VSN=1ff9be9b8fafc8528ca9e055646f5932aa5db9c4
-#SNAPPY_VSN=HEAD
+#SNAPPY_VSN=1ff9be9b8fafc8528ca9e055646f5932aa5db9c4
+SNAPPY_VSN=HEAD
 
 # HyperLevelDB Apr 23, 2014
-LEVELDB_VSN=4b9bac17ab11527ea15af0ea3c8f1b825a9de18a
-#LEVELDB_VSN=HEAD
+#LEVELDB_VSN=4b9bac17ab11527ea15af0ea3c8f1b825a9de18a
+LEVELDB_VSN=HEAD
 
 PLATFORM='unknown'
 unamestr=`uname`
@@ -91,16 +91,8 @@ case "$1" in
         ;;
 
     get_deps)
-	echo "Retrieving snappy"
-        # snappy
-        if [ ! -d $REBAR_DEPS_DIR/snappy ]; then
-            git clone git://github.com/leveldb-erlang/snappy.git $REBAR_DEPS_DIR/snappy
-        fi
-        # HyperLevelDB
-	echo "Retrieving HyperLevelDB"
-        if [ ! -d $REBAR_DEPS_DIR/HyperLevelDB ]; then
-             git clone git://github.com/leveldb-erlang/HyperLevelDB.git $REBAR_DEPS_DIR/HyperLevelDB
-        fi
+	git clone git://github.com/leveldb-erlang/snappy.git $BASEDIR/snappy-src
+        git clone git://github.com/leveldb-erlang/HyperLevelDB.git $BASEDIR/HyperLevelDB-src
         ;;
 
     *)
@@ -117,25 +109,18 @@ case "$1" in
                     exit -1
                 }
             }
-	echo "Creating a tar archive from the snappy git checkout and piping it to untar"
-	echo "COMMAND: (cd $REBAR_DEPS_DIR/snappy && git archive --format=tar --prefix=snappy-$SNAPPY_VSN/ $SNAPPY_VSN | "
-
-            (cd $REBAR_DEPS_DIR/snappy && git archive --format=tar \
-                --prefix=snappy-$SNAPPY_VSN/ $SNAPPY_VSN) \
-                | $TAR xf -
-            (cd snappy-$SNAPPY_VSN && \
+            (cd snappy-src && \
                 sed -ibak1 '/^AC_ARG_WITH.*$/, /^fi$/d' configure.ac && \
                 perl -ibak2 -pe 's/LT_INIT/AM_PROG_AR\nLT_INIT/' configure.ac
             )
-	echo "Building snappy"
-            (cd snappy-$SNAPPY_VSN && \
+            (cd snappy-src && \
                 rm -rf autom4te.cache && \
                 aclocal -I m4 && \
                 autoheader && \
                 $LIBTOOLIZE --copy && \
                 automake --add-missing --copy && \
                 autoconf)
-            (cd snappy-$SNAPPY_VSN && \
+            (cd snappy-src && \
                 env $CONFENV ./configure $CONFFLAGS \
                 --enable-static \
                 --disable-shared \
@@ -146,12 +131,7 @@ case "$1" in
 
         # HyperLevelDB
         if [ ! -f $BASEDIR/HyperLevelDB/lib/libhyperleveldb.a ]; then
-	echo "Archive/tar of hyperleveldb"
-            (cd $REBAR_DEPS_DIR/HyperLevelDB && git archive --format=tar \
-                --prefix=HyperLevelDB-$LEVELDB_VSN/ $LEVELDB_VSN) \
-                | $TAR xf -
-	echo "Building hyperleveldb"
-            (cd HyperLevelDB-$LEVELDB_VSN && \
+            (cd HyperLevelDB-src && \
                 autoreconf -i && \
                 env $CONFENV \
                     CXXFLAGS="$CXXFLAGS -fPIC -O2 -DNDEBUG -DSNAPPY -I$BASEDIR/snappy/include" \
@@ -159,7 +139,7 @@ case "$1" in
                 $MAKE && \
                 $MAKE .libs/libhyperleveldb.a && \
                 mkdir -p $BASEDIR/HyperLevelDB/include/hyperleveldb && \
-                install hyperleveldb/*.h $BASEDIR/HyperLevelDB/include/hyperleveldb && \
+                install include/hyperleveldb/*.h $BASEDIR/HyperLevelDB/include/hyperleveldb && \
                 mkdir -p $BASEDIR/HyperLevelDB/lib && \
                 install .libs/libhyperleveldb.a $BASEDIR/HyperLevelDB/lib/)
         fi
