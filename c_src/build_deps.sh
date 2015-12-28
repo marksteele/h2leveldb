@@ -118,6 +118,8 @@ case "$1" in
                 }
             }
 	echo "Creating a tar archive from the snappy git checkout and piping it to untar"
+	echo "COMMAND: (cd $REBAR_DEPS_DIR/snappy && git archive --format=tar --prefix=snappy-$SNAPPY_VSN/ $SNAPPY_VSN | "
+
             (cd $REBAR_DEPS_DIR/snappy && git archive --format=tar \
                 --prefix=snappy-$SNAPPY_VSN/ $SNAPPY_VSN) \
                 | $TAR xf -
