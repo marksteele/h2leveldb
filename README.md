@@ -40,7 +40,6 @@ HyperLevelDB and Snappy compression library. Therefore, you do not
 have to separately install and manage these products as dynamic shared
 libraries in a system path.
 
-
 ### What is HyperLevelDB?
 
 [**HyperLevelDB**](https://github.com/rescrv/HyperLevelDB) is a fork
@@ -64,7 +63,6 @@ For more information, please see the following articles:
 
 - [Inside HyperLevelDB](http://hackingdistributed.com/2013/06/17/hyperleveldb/)
 - [HyperLevelDB Performance Benchmarks](http://hyperdex.org/performance/leveldb/)
-
 
 ### What is Snappy?
 
@@ -321,7 +319,7 @@ For FreeBSD 10.0-RELEASE or newer, you can use pkgng to install
 pre-built packages.
 
 ```sh
-$ sudo pkg install gmake autoconf automake libtool git
+$ sudo pkg install bash gmake autoconf automake libtool git
 ```
 
 I have not tested h2leveldb with older FreeBSD releases, and I think
